@@ -83,7 +83,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->l21,SIGNAL(textChanged(QString)),this,SLOT(LineEditHSLChanged(QString)));
     connect(ui->l22,SIGNAL(textChanged(QString)),this,SLOT(LineEditHSLChanged(QString)));
 
-    connect(ui->lineEdit,SIGNAL(textChanged(QString)),this,SLOT(on_lineEdit_textChanged(QString)));
+    connect(ui->lineEdit, SIGNAL(textEdited(const QString &)), this, SLOT(on_lineEdit_textEdited(const QString &)));
+
 
     updateColorDisplay();
     updateCMYKSlidersAndLabels();
@@ -109,8 +110,14 @@ void MainWindow::on_lineEdit_textChanged(const QString &arg1)
         if (s.toInt(&ok,16)){
             currentColor.setNamedColor(arg1);
             updateColorDisplay();
+            updateCMYKSlidersAndLabels();
+            updateXYZSlidersAndLabels();
+            updateLABSlidersAndLabels();
+            updateHSVSlidersAndLabels();
+            updateHSLSlidersAndLabels();
         }
     }
+
 }
 
 void MainWindow::updateLineEditFromRGB(int r, int g, int b)
@@ -119,8 +126,9 @@ void MainWindow::updateLineEditFromRGB(int r, int g, int b)
                             .arg(r, 2, 16, QLatin1Char('0'))
                             .arg(g, 2, 16, QLatin1Char('0'))
                             .arg(b, 2, 16, QLatin1Char('0'));
-
+ui->lineEdit->blockSignals(true);
     ui->lineEdit->setText(colorCode);
+ui->lineEdit->blockSignals(false);
 }
 
 void MainWindow::setValue(QScrollBar *item, int value)
@@ -158,6 +166,9 @@ void MainWindow::updateColorDisplay() {
     updateLineEditFromRGB(r, g, b);
 
 }
+
+
+
 void MainWindow::updateRGBScrollBarFromColor(const QColor &color) // для кнопки
 {
 
@@ -168,6 +179,7 @@ void MainWindow::updateRGBScrollBarFromColor(const QColor &color) // для кн
     setValue(ui->bar5,r);
     setValue(ui->bar6,g);
     setValue(ui->bar7,b);
+
     ui->l5->setText(QString::number(r));
     ui->l6->setText(QString::number(g));
     ui->l7->setText(QString::number(b));
@@ -185,6 +197,9 @@ void MainWindow::LineEditRGBChanged(QString str)
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     uint N = str.toUInt(&ok);
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if (ok and N <= 255){
         if (parent->objectName() == "l5"){
             setValue(ui->bar5,N);
@@ -204,7 +219,11 @@ void MainWindow::LineEditRGBChanged(QString str)
         ui->l5->setText(QString::number(r));
         ui->l6->setText(QString::number(g));
         ui->l7->setText(QString::number(b));
+
     }
+
+
+
 }
 
 
@@ -298,6 +317,9 @@ void MainWindow::LineEditCMYKChanged(QString str)
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     double N = str.toDouble(&ok);
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if (ok and N <= 100){
         if (parent->objectName() == "l1"){
             setValue(ui->bar1,N);
@@ -507,7 +529,9 @@ void MainWindow::LineEditXYZChanged(QString str)
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     double N = str.toDouble(&ok);
-
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if(ok and N <= 109){
         if (parent->objectName() == "l11"){
             setValue(ui->bar11,N);
@@ -792,7 +816,9 @@ void MainWindow::LineEditLABChanged(QString str)
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     double N = str.toDouble(&ok);
-
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if(ok and N <= 128 and N>=-128){
         if (parent->objectName() == "l15"){
             setValue(ui->bar15,N);
@@ -983,7 +1009,9 @@ void MainWindow::LineEditHSVChanged(QString str){
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     double N = str.toDouble(&ok);
-
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if(ok and N <= 360 and N >= 0){
         if (parent->objectName() == "l20"){
             setValue(ui->bar17,N);
@@ -1112,7 +1140,9 @@ void MainWindow::LineEditHSLChanged(QString str){
     bool ok = true;
     QLineEdit* parent = dynamic_cast<QLineEdit*>(sender());
     double N = str.toDouble(&ok);
-
+    if (str.isEmpty()) {
+        N = 0.0;
+    } else
     if(ok and N <= 360 and N >= 0){
         if (parent->objectName() == "l20"){
             setValue(ui->bar20,N);
@@ -1149,7 +1179,6 @@ void MainWindow::LineEditHSLChanged(QString str){
 
 
 }
-
 
 
 
